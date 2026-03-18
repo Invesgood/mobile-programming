@@ -49,14 +49,14 @@ fun LoginScreen(
     var errorMsg by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // ── Photo area (top ~30%) ──
+        // ── Photo area (top ~40%) ──
         Image(
             painter = painterResource(id = R.drawable.loginsignup),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.30f)
+                .fillMaxHeight(0.35f)
         )
 
         // ── Cream card ──

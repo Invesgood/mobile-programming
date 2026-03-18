@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -14,6 +15,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,26 +27,7 @@ import kotlin.math.*
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
-    var startAnimation by remember { mutableStateOf(false) }
-
-    val alphaAnim by animateFloatAsState(
-        targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000, easing = EaseInOut),
-        label = "alpha"
-    )
-    val scaleAnim by animateFloatAsState(
-        targetValue = if (startAnimation) 1f else 0.75f,
-        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
-        label = "scale"
-    )
-    val textAlpha by animateFloatAsState(
-        targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(durationMillis = 900, delayMillis = 600, easing = EaseInOut),
-        label = "textAlpha"
-    )
-
     LaunchedEffect(Unit) {
-        startAnimation = true
         delay(3000)
         onFinished()
     }
@@ -54,90 +38,12 @@ fun SplashScreen(onFinished: () -> Unit) {
             .background(CreamBackground),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Ornate crest
-            Box(
-                modifier = Modifier
-                    .scale(scaleAnim)
-                    .alpha(alphaAnim)
-                    .size(220.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawNoblesseCrest(this)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // NOBLESSE
-            Text(
-                text = "NOBLESSE",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 6.sp,
-                color = Gold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.alpha(textAlpha)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // — PARFUM —
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.alpha(textAlpha)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(1.dp)
-                        .background(Gold)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(8.dp)
-                        .height(1.dp)
-                        .background(Gold)
-                        .padding(horizontal = 2.dp)
-                )
-                Text(
-                    text = "  PARFUM  ",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 5.sp,
-                    color = Gold
-                )
-                Box(
-                    modifier = Modifier
-                        .width(8.dp)
-                        .height(1.dp)
-                        .background(Gold)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(1.dp)
-                        .background(Gold)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // EST. 1928
-            Text(
-                text = "EST. 1928",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Normal,
-                letterSpacing = 3.sp,
-                color = GoldDark,
-                modifier = Modifier.alpha(textAlpha)
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.splashscreen),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

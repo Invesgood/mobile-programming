@@ -5,12 +5,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -34,10 +44,14 @@ class MainActivity : ComponentActivity() {
                 val db = remember { DatabaseHelper(context) }
                 var products by remember { mutableStateOf(db.getAllProducts()) }
 
+                Box(modifier = Modifier.fillMaxSize()) {
+
                 AnimatedContent(
                     targetState = currentScreen,
                     transitionSpec = {
                         when {
+                            initialState == AppScreen.SPLASH || targetState == AppScreen.ONBOARDING && initialState == AppScreen.SPLASH ->
+                                (slideInVertically(tween(500)) { it } + fadeIn(tween(500))) togetherWith fadeOut(tween(1))
                             targetState == AppScreen.SIGNUP ->
                                 (slideInHorizontally { it } + fadeIn()) togetherWith (slideOutHorizontally { -it } + fadeOut())
                             initialState == AppScreen.SIGNUP ->
@@ -61,9 +75,7 @@ class MainActivity : ComponentActivity() {
                     label = "screenTransition"
                 ) { screen ->
                     when (screen) {
-                        AppScreen.SPLASH -> SplashScreen(
-                            onFinished = { currentScreen = AppScreen.ONBOARDING }
-                        )
+                        AppScreen.SPLASH -> {}
                         AppScreen.ONBOARDING -> OnboardingScreen(
                             onFinished = { currentScreen = AppScreen.WELCOME }
                         )
@@ -150,6 +162,19 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+
+                AnimatedVisibility(
+                    visible = currentScreen == AppScreen.SPLASH,
+                    enter = fadeIn(tween(600)) + scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+                        initialScale = 0.85f
+                    ),
+                    exit = fadeOut(tween(400)) + scaleOut(tween(400), targetScale = 1.08f)
+                ) {
+                    SplashScreen(onFinished = { currentScreen = AppScreen.ONBOARDING })
+                }
+
+                } // end Box
             }
         }
     }

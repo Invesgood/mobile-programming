@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,61 +62,40 @@ fun WelcomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) {
-            // Crest
-            Box(
+            // Logo
+            Image(
+                painter = painterResource(id = R.drawable.splashscreen),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .scale(scaleAnim)
                     .alpha(alphaAnim)
-                    .size(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    drawNoblesseCrest(this)
-                }
-            }
+            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // NOBLESSE
             Text(
-                text = "NOBLESSE",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 6.sp,
-                color = Gold,
+                text = "Temukan aroma yang\nmencerminkan dirimu",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = TextDark,
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.alpha(alphaAnim)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Koleksi parfum eksklusif pilihan untuk setiap momen",
+                fontSize = 13.sp,
+                color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.alpha(alphaAnim)
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // — PARFUM —
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.alpha(alphaAnim)
-            ) {
-                Box(Modifier.width(28.dp).height(1.dp).background(Gold))
-                Text(
-                    text = "  PARFUM  ",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 4.sp,
-                    color = Gold
-                )
-                Box(Modifier.width(28.dp).height(1.dp).background(Gold))
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "EST. 1928",
-                fontSize = 11.sp,
-                letterSpacing = 3.sp,
-                color = GoldDark,
-                modifier = Modifier.alpha(alphaAnim)
-            )
-
-            Spacer(modifier = Modifier.height(52.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // LOGIN button (solid)
             Button(
