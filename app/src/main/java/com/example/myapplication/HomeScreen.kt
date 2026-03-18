@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -176,30 +174,16 @@ fun HomeScreen(
                 }
             }
 
-            // Category filter row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 0.dp)
-                    .padding(bottom = 14.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                scentCategories.forEachIndexed { index, cat ->
-                    CategoryChip(
-                        category = cat,
-                        isSelected = index == selectedCategory,
-                        onClick = {
-                            prevCategory = selectedCategory
-                            selectedCategory = index
-                        }
-                    )
-                }
-            }
         }
 
-        // ── Perfume list with slide animation ─────
-        AnimatedContent(
+        // ── Chips + Content area ──
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            // Content area (full size, cream background)
+            AnimatedContent(
             targetState = selectedCategory,
             transitionSpec = {
                 if (targetState > prevCategory)
@@ -211,15 +195,14 @@ fun HomeScreen(
             },
             label = "categoryContent",
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(CreamBackground)
         ) { category ->
             val displayed = products.filter { it.category == category }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 140.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 if (displayed.isEmpty()) {
                     item {
@@ -239,6 +222,35 @@ fun HomeScreen(
                 } else {
                     items(displayed) { perfume ->
                         PerfumeCard(perfume, onClick = { onNavigateToProduct(perfume) })
+                    }
+                }
+            }
+        }
+
+            // Chips bar — dark background (looks like extension of NavBar)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .background(NavBar)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    scentCategories.forEachIndexed { index, cat ->
+                        CategoryChip(
+                            category = cat,
+                            isSelected = index == selectedCategory,
+                            onClick = {
+                                prevCategory = selectedCategory
+                                selectedCategory = index
+                            }
+                        )
                     }
                 }
             }
@@ -271,48 +283,83 @@ private fun CategoryChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val offsetY by animateDpAsState(
-        targetValue = if (isSelected) (-6).dp else 0.dp,
-        label = "chipOffset"
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+    Box(
         modifier = Modifier
-            .offset(y = offsetY)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
-            )
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(if (isSelected) 52.dp else 48.dp)
-                .shadow(if (isSelected) 10.dp else 2.dp, CircleShape)
-                .clip(CircleShape)
-                .background(if (isSelected) Gold else Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            Canvas(modifier = Modifier.size(28.dp)) {
-                val tint = if (isSelected) Color(0xFF1A1A1A) else Color(0xFF222222)
-                when (category.iconType) {
-                    0 -> drawTreeIcon(this, tint)
-                    1 -> drawFlowerIcon(this, tint)
-                    2 -> drawSmileyIcon(this, tint)
-                    3 -> drawPineappleIcon(this, tint)
-                    4 -> drawSunIcon(this, tint)
+        if (isSelected) {
+            // Active — cream card, rounded top, flat bottom (connects to cream content below)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 0.dp, bottomEnd = 0.dp))
+                    .background(CreamBackground)
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 10.dp, bottom = 16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Gold),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Canvas(modifier = Modifier.size(26.dp)) {
+                        when (category.iconType) {
+                            0 -> drawTreeIcon(this, Color(0xFF1A1A1A))
+                            1 -> drawFlowerIcon(this, Color(0xFF1A1A1A))
+                            2 -> drawSmileyIcon(this, Color(0xFF1A1A1A))
+                            3 -> drawPineappleIcon(this, Color(0xFF1A1A1A))
+                            4 -> drawSunIcon(this, Color(0xFF1A1A1A))
+                        }
+                    }
                 }
+                Text(
+                    text = category.label,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            // Inactive — stroke-only oval (transparent inside, gold border)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp, 50.dp)
+                        .border(1.5.dp, Gold, RoundedCornerShape(50)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Canvas(modifier = Modifier.size(26.dp)) {
+                        when (category.iconType) {
+                            0 -> drawTreeIcon(this, Gold)
+                            1 -> drawFlowerIcon(this, Gold)
+                            2 -> drawSmileyIcon(this, Gold)
+                            3 -> drawPineappleIcon(this, Gold)
+                            4 -> drawSunIcon(this, Gold)
+                        }
+                    }
+                }
+                Text(
+                    text = category.label,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
             }
         }
-        Text(
-            text = category.label,
-            fontSize = 10.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) Gold else TextGray,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -495,13 +542,13 @@ private fun PerfumeCard(perfume: PerfumeItem, onClick: () -> Unit) {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp)
+                        .height(200.dp)
                 )
             } else {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp)
+                        .height(200.dp)
                         .background(
                             Brush.verticalGradient(
                                 listOf(perfume.photoTop, perfume.photoBottom)
