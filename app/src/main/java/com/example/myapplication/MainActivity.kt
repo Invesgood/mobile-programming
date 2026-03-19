@@ -4,17 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
@@ -31,27 +27,38 @@ enum class AppScreen {
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                var currentScreen by remember { mutableStateOf(AppScreen.SPLASH) }
+                val context = LocalContext.current
+                val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val splashAlreadyShown = prefs.getBoolean("splash_shown", false)
+                var splashDone by remember { mutableStateOf(splashAlreadyShown) }
+                var currentScreen by remember { mutableStateOf(AppScreen.ONBOARDING) }
                 var loggedInUser by remember { mutableStateOf("") }
                 var userProfile by remember { mutableStateOf(UserProfile()) }
                 var selectedPerfume by remember { mutableStateOf<PerfumeItem?>(null) }
-
-                val context = LocalContext.current
                 val db = remember { DatabaseHelper(context) }
                 var products by remember { mutableStateOf(db.getAllProducts()) }
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Crossfade(
+                    targetState = splashDone,
+                    animationSpec = tween(600),
+                    label = "splashCrossfade"
+                ) { done ->
+                if (!done) {
+                    SplashScreen(onFinished = {
+                        prefs.edit().putBoolean("splash_shown", true).apply()
+                        splashDone = true
+                    })
+                } else {
 
                 AnimatedContent(
                     targetState = currentScreen,
                     transitionSpec = {
                         when {
-                            initialState == AppScreen.SPLASH || targetState == AppScreen.ONBOARDING && initialState == AppScreen.SPLASH ->
-                                (slideInVertically(tween(500)) { it } + fadeIn(tween(500))) togetherWith fadeOut(tween(1))
                             targetState == AppScreen.SIGNUP ->
                                 (slideInHorizontally { it } + fadeIn()) togetherWith (slideOutHorizontally { -it } + fadeOut())
                             initialState == AppScreen.SIGNUP ->
@@ -163,18 +170,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                AnimatedVisibility(
-                    visible = currentScreen == AppScreen.SPLASH,
-                    enter = fadeIn(tween(600)) + scaleIn(
-                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
-                        initialScale = 0.85f
-                    ),
-                    exit = fadeOut(tween(400)) + scaleOut(tween(400), targetScale = 1.08f)
-                ) {
-                    SplashScreen(onFinished = { currentScreen = AppScreen.ONBOARDING })
-                }
-
-                } // end Box
+                } // end if splashDone
+                } // end Crossfade
             }
         }
     }

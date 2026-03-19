@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyApplication" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Theme utama app -->
+    <style name="Theme.MyApplication" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F5EFE6</item>
+        <item name="android:windowIsTranslucent">false</item>
+    </style>
+
+    <!-- Theme untuk splash screen (Android 12+) -->
+    <style name="Theme.MyApplication.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F5F0E6</item>
+        <item name="android:windowBackground">#F5F0E6</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyApplication</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
+    </style>
+
 </resources>

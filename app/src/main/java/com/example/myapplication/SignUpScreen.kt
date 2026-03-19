@@ -92,7 +92,7 @@ fun SignUpScreen(
                 label = "Full Name",
                 value = fullName,
                 onValueChange = { fullName = it },
-                placeholder = "example@exmaple.com"
+                placeholder = "Nama lengkap kamu"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +115,7 @@ fun SignUpScreen(
                 label = "Email",
                 value = email,
                 onValueChange = { email = it },
-                placeholder = "example@exmaple.com",
+                placeholder = "example@email.com",
                 keyboardType = KeyboardType.Email
             )
 
@@ -125,21 +125,27 @@ fun SignUpScreen(
             FormField(
                 label = "Mobile Number",
                 value = mobileNumber,
-                onValueChange = { mobileNumber = it },
-                placeholder = "+62",
+                onValueChange = { newValue ->
+                    val digits = newValue.filter { it.isDigit() }.take(13)
+                    mobileNumber = digits.chunked(4).joinToString("-")
+                },
+                placeholder = "0812-3456-7890",
                 keyboardType = KeyboardType.Phone
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Date of Birth
-            FormField(
-                label = "Date of birth",
-                value = dateOfBirth,
-                onValueChange = { dateOfBirth = it },
-                placeholder = "DD / MM / YY",
-                keyboardType = KeyboardType.Number
-            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Date of birth",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextDark
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                DateInputRow(value = dateOfBirth, onValueChange = { dateOfBirth = it })
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

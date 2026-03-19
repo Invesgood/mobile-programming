@@ -57,6 +57,7 @@ data class PerfumeItem(
     val photoTop: Color,
     val photoBottom: Color,
     val photoUri: String? = null,
+    val photoResId: Int? = null,
     val id: Int = 0
 )
 
@@ -70,20 +71,20 @@ val scentCategories = listOf(
 
 val perfumeList = listOf(
     // Woody
-    PerfumeItem("Vanilla Sky", "Tukan", "Rp 450.000", 0, Color(0xFFD4C4A8), Color(0xFF6B5030)),
-    PerfumeItem("White Forest", "Björk & Berries", "Rp 620.000", 0, Color(0xFFDED8CC), Color(0xFF706050)),
+    PerfumeItem("Vanilla Sky", "Tukan", "Rp 450.000", 0, Color(0xFFD4C4A8), Color(0xFF6B5030), photoResId = R.drawable.woody1),
+    PerfumeItem("White Forest", "Björk & Berries", "Rp 620.000", 0, Color(0xFFDED8CC), Color(0xFF706050), photoResId = R.drawable.woody2),
     // Floral
-    PerfumeItem("Casnia", "Atelier de Fleurs Chloé", "Rp 580.000", 1, Color(0xFFC8B8A0), Color(0xFF7A6040)),
-    PerfumeItem("Flower Muse", "Flora Danica", "Rp 680.000", 1, Color(0xFFD4DCC8), Color(0xFF808A68)),
+    PerfumeItem("Casnia", "Atelier de Fleurs Chloé", "Rp 580.000", 1, Color(0xFFC8B8A0), Color(0xFF7A6040), photoResId = R.drawable.floral1),
+    PerfumeItem("Flower Muse", "Flora Danica", "Rp 680.000", 1, Color(0xFFD4DCC8), Color(0xFF808A68), photoResId = R.drawable.floral2),
     // Fresh
-    PerfumeItem("September", "Björk & Berries", "Rp 520.000", 2, Color(0xFFF0E8D8), Color(0xFF988060)),
-    PerfumeItem("Fjällsjö", "Björk & Berries", "Rp 490.000", 2, Color(0xFFD0E8D8), Color(0xFF608070)),
+    PerfumeItem("September", "Björk & Berries", "Rp 520.000", 2, Color(0xFFF0E8D8), Color(0xFF988060), photoResId = R.drawable.fresh1),
+    PerfumeItem("Fjällsjö", "Björk & Berries", "Rp 490.000", 2, Color(0xFFD0E8D8), Color(0xFF608070), photoResId = R.drawable.fresh2),
     // Fruity
-    PerfumeItem("Pink Pepper", "Chloé", "Rp 720.000", 3, Color(0xFFE8C8C0), Color(0xFFC08878)),
-    PerfumeItem("Botanist", "Björk & Berries", "Rp 550.000", 3, Color(0xFFE0D0C0), Color(0xFFA08060)),
+    PerfumeItem("Pink Pepper", "Chloé", "Rp 720.000", 3, Color(0xFFE8C8C0), Color(0xFFC08878), photoResId = R.drawable.fruity1),
+    PerfumeItem("Botanist", "Björk & Berries", "Rp 550.000", 3, Color(0xFFE0D0C0), Color(0xFFA08060), photoResId = R.drawable.fruity2),
     // Warm/Oriental
-    PerfumeItem("Oud Intense", "Noblesse Private", "Rp 850.000", 4, Color(0xFF3A2A1A), Color(0xFF1A1008)),
-    PerfumeItem("Bleu Noir", "Chanel", "Rp 1.200.000", 4, Color(0xFF2A2A3A), Color(0xFF0A0A1A))
+    PerfumeItem("Oud Intense", "Noblesse Private", "Rp 850.000", 4, Color(0xFF3A2A1A), Color(0xFF1A1008), photoResId = R.drawable.warm1),
+    PerfumeItem("Bleu Noir", "Chanel", "Rp 1.200.000", 4, Color(0xFF2A2A3A), Color(0xFF0A0A1A), photoResId = R.drawable.warm2)
 )
 
 // ── Screen ────────────────────────────────────────
@@ -150,7 +151,7 @@ fun HomeScreen(
                             ) { onNavigateToFaq() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "🔔", color = Gold, fontSize = 15.sp, textAlign = TextAlign.Center)
+                        Text(text = "?", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                     Box(
                         modifier = Modifier
@@ -527,6 +528,7 @@ private fun PerfumeCard(perfume: PerfumeItem, onClick: () -> Unit) {
             .fillMaxWidth()
             .shadow(4.dp, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, Color(0xFF1A1A1A), RoundedCornerShape(12.dp))
             .background(Color.White)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -535,26 +537,44 @@ private fun PerfumeCard(perfume: PerfumeItem, onClick: () -> Unit) {
     ) {
         Column {
             // Photo area
-            if (perfume.photoUri != null) {
-                AsyncImage(
-                    model = android.net.Uri.parse(perfume.photoUri),
-                    contentDescription = perfume.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(perfume.photoTop, perfume.photoBottom)
-                            )
+            when {
+                perfume.photoResId != null -> {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(perfume.photoResId),
+                        contentDescription = perfume.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
+                perfume.photoUri != null -> {
+                    AsyncImage(
+                        model = android.net.Uri.parse(perfume.photoUri),
+                        contentDescription = perfume.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
+                else -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(Color(0xFFEDE8E0)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(R.drawable.splashscreen),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxWidth(0.5f).padding(16.dp),
+                            alpha = 0.3f
                         )
-                )
+                    }
+                }
             }
 
             // Details strip

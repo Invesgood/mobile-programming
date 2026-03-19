@@ -105,45 +105,19 @@ fun FaqScreen(onBack: () -> Unit) {
                 .padding(bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Bell icon (Canvas)
-            androidx.compose.foundation.Canvas(modifier = Modifier.size(48.dp)) {
-                val cx = size.width / 2f
-                val gold = Gold
-
-                // Bell body
-                val path = androidx.compose.ui.graphics.Path().apply {
-                    moveTo(cx, size.height * 0.08f)
-                    cubicTo(
-                        cx - size.width * 0.35f, size.height * 0.08f,
-                        cx - size.width * 0.42f, size.height * 0.35f,
-                        cx - size.width * 0.42f, size.height * 0.62f
-                    )
-                    lineTo(cx - size.width * 0.48f, size.height * 0.75f)
-                    lineTo(cx + size.width * 0.48f, size.height * 0.75f)
-                    lineTo(cx + size.width * 0.42f, size.height * 0.62f)
-                    cubicTo(
-                        cx + size.width * 0.42f, size.height * 0.35f,
-                        cx + size.width * 0.35f, size.height * 0.08f,
-                        cx, size.height * 0.08f
-                    )
-                    close()
-                }
-                drawPath(path, gold)
-
-                // Clapper
-                drawCircle(
-                    color = gold,
-                    radius = size.width * 0.09f,
-                    center = androidx.compose.ui.geometry.Offset(cx, size.height * 0.85f)
-                )
-
-                // Stem
-                drawLine(
-                    color = gold,
-                    start = androidx.compose.ui.geometry.Offset(cx - size.width * 0.07f, size.height * 0.08f),
-                    end = androidx.compose.ui.geometry.Offset(cx + size.width * 0.07f, size.height * 0.08f),
-                    strokeWidth = size.width * 0.06f,
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+            // Question mark icon
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Gold),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "?",
+                    color = Color(0xFF1A1A1A),
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
             }
 
@@ -226,8 +200,8 @@ private fun FaqCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (isExpanded) "−" else "+",
-                    fontSize = 16.sp,
+                    text = if (isExpanded) "↑" else "↓",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isExpanded) Gold else TextGray
                 )

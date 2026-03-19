@@ -24,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Canvas
@@ -335,6 +338,116 @@ private fun drawEyeSlashIcon(scope: DrawScope) {
             end = Offset(cx + size.width * 0.35f, cy - size.height * 0.32f),
             strokeWidth = 2.5f,
             cap = StrokeCap.Round
+        )
+    }
+}
+
+@Composable
+fun DateInputRow(
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    val initialDigits = value.filter { it.isDigit() }
+    var day by remember { mutableStateOf(initialDigits.take(2)) }
+    var month by remember {
+        mutableStateOf(
+            if (initialDigits.length > 2) initialDigits.substring(2, minOf(4, initialDigits.length)) else ""
+        )
+    }
+    var year by remember {
+        mutableStateOf(if (initialDigits.length > 4) initialDigits.drop(4) else "")
+    }
+
+    val monthFocus = remember { FocusRequester() }
+    val yearFocus = remember { FocusRequester() }
+
+    fun emit() { onValueChange("$day / $month / $year") }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DateSegment(
+            value = day,
+            placeholder = "DD",
+            modifier = Modifier.weight(1f),
+            onValueChange = { d ->
+                day = d.filter { it.isDigit() }.take(2)
+                emit()
+                if (day.length == 2) runCatching { monthFocus.requestFocus() }
+            }
+        )
+        Text("/", color = Color(0xFFAAAAAA), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        DateSegment(
+            value = month,
+            placeholder = "MM",
+            modifier = Modifier.weight(1f),
+            focusRequester = monthFocus,
+            onValueChange = { m ->
+                month = m.filter { it.isDigit() }.take(2)
+                emit()
+                if (month.length == 2) runCatching { yearFocus.requestFocus() }
+            }
+        )
+        Text("/", color = Color(0xFFAAAAAA), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        DateSegment(
+            value = year,
+            placeholder = "YYYY",
+            modifier = Modifier.weight(2f),
+            focusRequester = yearFocus,
+            onValueChange = { y ->
+                year = y.filter { it.isDigit() }.take(4)
+                emit()
+            }
+        )
+    }
+}
+
+@Composable
+private fun DateSegment(
+    value: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
+    onValueChange: (String) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .height(50.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(com.example.myapplication.ui.theme.DarkButton),
+        contentAlignment = Alignment.Center
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            textStyle = TextStyle(
+                color = Color.White,
+                fontSize = 15.sp,
+                textAlign = TextAlign.Center
+            ),
+            cursorBrush = SolidColor(com.example.myapplication.ui.theme.Gold),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier),
+            decorationBox = { inner ->
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            color = Color(0xFF888888),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    inner()
+                }
+            }
         )
     }
 }

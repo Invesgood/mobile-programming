@@ -119,9 +119,22 @@ fun EditProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
             EditField("Email", email, { email = it }, "Masukkan email", KeyboardType.Email)
             Spacer(modifier = Modifier.height(16.dp))
-            EditField("Nomor HP", phone, { phone = it }, "+62", KeyboardType.Phone)
+            EditField(
+                label = "Nomor HP",
+                value = phone,
+                onValueChange = { newValue ->
+                    val digits = newValue.filter { it.isDigit() }.take(13)
+                    phone = digits.chunked(4).joinToString("-")
+                },
+                placeholder = "0812-3456-7890",
+                keyboardType = KeyboardType.Phone
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            EditField("Tanggal Lahir", dateOfBirth, { dateOfBirth = it }, "DD / MM / YYYY", KeyboardType.Number)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text("Tanggal Lahir", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+                Spacer(modifier = Modifier.height(8.dp))
+                DateInputRow(value = dateOfBirth, onValueChange = { dateOfBirth = it })
+            }
 
             Spacer(modifier = Modifier.height(40.dp))
 

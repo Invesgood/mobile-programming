@@ -69,16 +69,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "noblesse_db"
         val cursor = readableDatabase.rawQuery("SELECT * FROM products ORDER BY id ASC", null)
         cursor.use {
             while (it.moveToNext()) {
+                val name = it.getString(it.getColumnIndexOrThrow("name"))
+                val photoResId = perfumeList.find { p -> p.name == name }?.photoResId
                 list.add(
                     PerfumeItem(
                         id = it.getInt(it.getColumnIndexOrThrow("id")),
-                        name = it.getString(it.getColumnIndexOrThrow("name")),
+                        name = name,
                         brand = it.getString(it.getColumnIndexOrThrow("brand")),
                         price = it.getString(it.getColumnIndexOrThrow("price")),
                         category = it.getInt(it.getColumnIndexOrThrow("category")),
                         photoTop = Color(it.getLong(it.getColumnIndexOrThrow("photoTopColor")).toULong()),
                         photoBottom = Color(it.getLong(it.getColumnIndexOrThrow("photoBottomColor")).toULong()),
-                        photoUri = it.getString(it.getColumnIndexOrThrow("photoUri"))
+                        photoUri = it.getString(it.getColumnIndexOrThrow("photoUri")),
+                        photoResId = photoResId
                     )
                 )
             }
